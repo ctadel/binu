@@ -1,0 +1,18 @@
+<schemalist>
+  <schema id="org.gnome.shell.extensions.binu" path="/org/gnome/shell/extensions/binu/">
+    <key name="swap-hotkey" type="as">
+    <default><![CDATA[['<Control>F8']]]></default>
+        <summary>Hotkey for swapping windows between monitors</summary>
+        <description>
+            Key to run swap all applications between two monitors
+        </description>
+    </key>
+    <key name="cursor-hotkey" type="as">
+    <default><![CDATA[['<Control>F9']]]></default>
+        <summary>Hotkey for cycling cursor between monitors</summary>
+        <description>
+            Key to run move the cursor to next monitor
+        </description>
+    </key>
+  </schema>
+</schemalist>
