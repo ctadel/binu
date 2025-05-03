@@ -1,4 +1,5 @@
 import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 import CommandRunner from './commands.js';
 
 const ANIMATION_DURATION_MS = 50;
@@ -30,12 +31,8 @@ class CursorAnimator {
 
     setCursorSize(size) {
         try {
-            CommandRunner.runCommand(['gsettings', 'set', 'org.gnome.desktop.interface', 'cursor-size', size.toString()])
-                .then(([success, stdout]) => {
-                    if (!success) {
-                        console.error(`[binu] Failed to set cursor size: ${stdout}`);
-                    }
-                });
+            let settings = new Gio.Settings({ schema: 'org.gnome.desktop.interface' });
+            settings.set_int('cursor-size', size);
         } catch (error) {
             console.error(`[binu] Failed to set cursor size: ${error}`);
         }
@@ -88,17 +85,9 @@ class CursorAnimator {
     }
 }
 
-export async function getCursorSize() {
-    try {
-        const [ok, stdout] = await CommandRunner.runCommand(['gsettings', 'get', 'org.gnome.desktop.interface', 'cursor-size']);
-        if (ok) {
-            const size = parseInt(stdout.trim());
-            return isNaN(size) ? 24 : size;
-        }
-    } catch (error) {
-        console.error(`[binu] Failed to get cursor size: ${error}`);
-    }
-  return 24;
+export function getCursorSize() {
+    let settings = new Gio.Settings({ schema: 'org.gnome.desktop.interface' });
+    return settings.get_int('cursor-size');
 }
 
 export async function moveCursorToNextMonitor(cursor_size) {

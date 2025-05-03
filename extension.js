@@ -10,18 +10,10 @@ export default class BinuExtension extends Extension {
         this._settings = this.getSettings();
         this._swapBinding = 'swap-hotkey';
         this._cursorBinding = 'cursor-hotkey';
+        this.originalCursorSize = Cursor.getCursorSize()
 
         this._registerShortcut(this._swapBinding, () => Swapper.swapWindows());
-
-        let originalCursorSize = 24;
-        Cursor.getCursorSize().then(size => {
-            originalCursorSize = size;
-            console.debug(`[binu] Original cursor size fetched: ${originalCursorSize}`);
-        }).catch(error => {
-            console.error(`[binu] Error fetching cursor size: ${error}`);
-        });
-
-        this._registerShortcut(this._cursorBinding, () => Cursor.moveCursorToNextMonitor(originalCursorSize));
+        this._registerShortcut(this._cursorBinding, () => Cursor.moveCursorToNextMonitor(this.originalCursorSize));
 
         console.info('Binu extension enabled');
     }
