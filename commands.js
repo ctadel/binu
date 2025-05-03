@@ -1,4 +1,4 @@
-const { Gio } = imports.gi;
+import Gio from 'gi://Gio';
 
 class CommandRunner {
     static runCommand(argv) {
