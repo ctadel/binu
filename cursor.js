@@ -1,6 +1,6 @@
-import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
 import CommandRunner from './commands.js';
+import { Timer } from './utils.js';
 
 const ANIMATION_DURATION_MS = 50;
 
@@ -19,11 +19,11 @@ class CursorAnimator {
             await this.animateCursor();
 
             // Delay a bit before restoring, then restore size and wiggle
-            await this.sleep(100);
+            await Timer.sleep(100);
             this.setCursorSize(this.originalCursorSize);
             console.debug(`[binu] Cursor size restored to ${this.originalCursorSize}`);
 
-            this.nudgeCursor(); // force refresh
+            await this.nudgeCursor(); // force refresh
         } catch (error) {
             console.error(`[binu] Error in run(): ${error}`);
         }
@@ -56,10 +56,11 @@ class CursorAnimator {
             const delay = Math.floor(this.animationDuration / steps);
 
             for (let i = 0; i <= steps; i++) {
+                if (!Timer.enabled) return;
                 const px = Math.round(x + dx * (i / steps));
                 const py = Math.round(y + dy * (i / steps));
                 await CommandRunner.runCommand(['xdotool', 'mousemove', px.toString(), py.toString()]);
-                if (delay > 0) await this.sleep(delay);
+                if (delay > 0) await Timer.sleep(delay);
             }
 
             console.debug(`[binu] Pointer moved to center of monitor ${nextMonitor}`);
@@ -68,20 +69,11 @@ class CursorAnimator {
         }
     }
 
-    nudgeCursor() {
+    async nudgeCursor() {
         const [x, y] = global.get_pointer();
         CommandRunner.runCommand(['xdotool', 'mousemove', (x + 1).toString(), y.toString()]);
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
-            CommandRunner.runCommand(['xdotool', 'mousemove', x.toString(), y.toString()]);
-            return GLib.SOURCE_REMOVE;
-        });
-    }
-
-    sleep(ms) {
-        return new Promise(resolve => GLib.timeout_add(GLib.PRIORITY_DEFAULT, ms, () => {
-            resolve();
-            return GLib.SOURCE_REMOVE;
-        }));
+        await Timer.sleep(50);
+        CommandRunner.runCommand(['xdotool', 'mousemove', x.toString(), y.toString()]);
     }
 }
 

@@ -4,9 +4,11 @@ import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as Swapper from './swapper.js';
 import * as Cursor from './cursor.js';
+import { Timer } from './utils.js'
 
 export default class BinuExtension extends Extension {
     enable() {
+        Timer.enable()
         this._settings = this.getSettings();
         this._swapBinding = 'swap-hotkey';
         this._cursorBinding = 'cursor-hotkey';
@@ -19,6 +21,7 @@ export default class BinuExtension extends Extension {
     }
 
     disable() {
+        Timer.disable()
         Main.wm.removeKeybinding(this._swapBinding);
         Main.wm.removeKeybinding(this._cursorBinding);
         this._settings = null;
