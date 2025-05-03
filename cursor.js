@@ -1,4 +1,4 @@
-const { GLib } = imports.gi;
+import GLib from 'gi://GLib';
 import CommandRunner from './commands.js';
 
 const ANIMATION_DURATION_MS = 50;
