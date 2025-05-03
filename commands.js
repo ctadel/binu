@@ -16,7 +16,7 @@ class CommandRunner {
                         const [, stdout, stderr] = proc.communicate_utf8_finish(res);
                         const success = proc.get_successful();
                         if (!success) {
-                            log(`[binu] Command failed: ${argv.join(' ')}\n${stderr}`);
+                            console.error(`[binu] Command failed: ${argv.join(' ')}\n${stderr}`);
                         }
                         resolve([success, stdout]);
                     } catch (e) {

@@ -19,7 +19,7 @@ export function swapWindows() {
         for (const win of windowsByMonitor[mon2]) {
             win.move_to_monitor(mon1);
         }
-        log(`[binu] Swapped windows between monitors ${mon1} and ${mon2}`);
+        console.debug(`[binu] Swapped windows between monitors ${mon1} and ${mon2}`);
     } else if (monitorsWithWindows.length === 1 && totalMonitors >= 2) {
         const sourceMonitor = monitorsWithWindows[0];
         const targetMonitor = [...Array(totalMonitors).keys()].find(m => m !== sourceMonitor);
@@ -28,8 +28,8 @@ export function swapWindows() {
             win.move_to_monitor(targetMonitor);
         }
 
-        log(`[binu] Moved all windows from monitor ${sourceMonitor} to monitor ${targetMonitor}`);
+        console.debug(`[binu] Moved all windows from monitor ${sourceMonitor} to monitor ${targetMonitor}`);
     } else {
-        log(`[binu] Cannot swap windows – need at least 2 monitors.`);
+        console.info(`[binu] Cannot swap windows – need at least 2 monitors.`);
     }
 }

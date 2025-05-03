@@ -13,18 +13,18 @@ class CursorAnimator {
         try {
             const increasedSize = this.originalCursorSize * 3;
             this.setCursorSize(increasedSize);
-            log(`[binu] Cursor size tripled: ${increasedSize}`);
+            console.debug(`[binu] Cursor size tripled: ${increasedSize}`);
 
             await this.animateCursor();
 
             // Delay a bit before restoring, then restore size and wiggle
             await this.sleep(100);
             this.setCursorSize(this.originalCursorSize);
-            log(`[binu] Cursor size restored to ${this.originalCursorSize}`);
+            console.debug(`[binu] Cursor size restored to ${this.originalCursorSize}`);
 
             this.nudgeCursor(); // force refresh
         } catch (error) {
-            log(`[binu] Error in run(): ${error}`);
+            console.error(`[binu] Error in run(): ${error}`);
         }
     }
 
@@ -33,11 +33,11 @@ class CursorAnimator {
             CommandRunner.runCommand(['gsettings', 'set', 'org.gnome.desktop.interface', 'cursor-size', size.toString()])
                 .then(([success, stdout]) => {
                     if (!success) {
-                        log(`[binu] Failed to set cursor size: ${stdout}`);
+                        console.error(`[binu] Failed to set cursor size: ${stdout}`);
                     }
                 });
         } catch (error) {
-            log(`[binu] Failed to set cursor size: ${error}`);
+            console.error(`[binu] Failed to set cursor size: ${error}`);
         }
     }
 
@@ -65,9 +65,9 @@ class CursorAnimator {
                 if (delay > 0) await this.sleep(delay);
             }
 
-            log(`[binu] Pointer moved to center of monitor ${nextMonitor}`);
+            console.debug(`[binu] Pointer moved to center of monitor ${nextMonitor}`);
         } catch (error) {
-            log(`[binu] Failed to move pointer: ${error}`);
+            console.error(`[binu] Failed to move pointer: ${error}`);
         }
     }
 
@@ -96,7 +96,7 @@ export async function getCursorSize() {
             return isNaN(size) ? 24 : size;
         }
     } catch (error) {
-        log(`[binu] Failed to get cursor size: ${error}`);
+        console.error(`[binu] Failed to get cursor size: ${error}`);
     }
   return 24;
 }
@@ -106,6 +106,6 @@ export async function moveCursorToNextMonitor(cursor_size) {
         const animator = new CursorAnimator(cursor_size, ANIMATION_DURATION_MS);
         await animator.run();
     } catch (e) {
-        log(`[binu] Unhandled error in moveCursorToNextMonitor: ${e}`);
+        console.error(`[binu] Unhandled error in moveCursorToNextMonitor: ${e}`);
     }
 }
