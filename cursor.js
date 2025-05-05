@@ -13,27 +13,18 @@ export class CursorAnimator {
 
     async animateTo(targetX, targetY) {
         try {
-            this.setCursorSize(this.zoomedCursorSize);
+            CursorConfig.setCursorSize(this.zoomedCursorSize);
             console.debug(`[binu] Cursor size increased to: ${this.zoomedCursorSize}`);
 
             await this._animateCursor(targetX, targetY);
 
             await Timer.sleep(100);
-            this.setCursorSize(this.originalCursorSize);
+            CursorConfig.setCursorSize(this.originalCursorSize);
             console.debug(`[binu] Cursor size restored to: ${this.originalCursorSize}`);
 
             await this._nudgeCursor(); // to force refresh
         } catch (error) {
             console.error(`[binu] animateTo() error: ${error}`);
-        }
-    }
-
-    setCursorSize(size) {
-        try {
-            const settings = new Gio.Settings({ schema: 'org.gnome.desktop.interface' });
-            settings.set_int('cursor-size', size);
-        } catch (error) {
-            console.error(`[binu] Failed to set cursor size: ${error}`);
         }
     }
 
@@ -64,39 +55,18 @@ export class CursorAnimator {
     }
 }
 
-export function getCursorSize() {
-    const settings = new Gio.Settings({ schema: 'org.gnome.desktop.interface' });
-    return settings.get_int('cursor-size');
-}
-
-function _focusMostRecentWindowOnMonitor(monitorIndex) {
-    const recentWindows = global.display.get_tab_list(0, null);
-
-    for (const win of recentWindows) {
-        if (!win.minimized && !win.skip_taskbar && win.get_monitor() === monitorIndex) {
-            win.activate(global.get_current_time());
-            return;
-        }
+export class CursorConfig {
+    static getCursorSize() {
+        const settings = new Gio.Settings({ schema: 'org.gnome.desktop.interface' });
+        return settings.get_int('cursor-size');
     }
-}
 
-export async function moveCursorToNextMonitor(cursorSize) {
-    try {
-        const display = global.display;
-        const currentMonitor = display.get_current_monitor();
-        const totalMonitors = display.get_n_monitors();
-        const nextMonitor = (currentMonitor + 1) % totalMonitors;
-
-        const geometry = display.get_monitor_geometry(nextMonitor);
-        const centerX = geometry.x + geometry.width / 2;
-        const centerY = geometry.y + geometry.height / 2;
-
-        //TODO: Add a condition based on user settings
-        _focusMostRecentWindowOnMonitor(nextMonitor);
-
-        const animator = new CursorAnimator(cursorSize);
-        await animator.animateTo(centerX, centerY);
-    } catch (error) {
-        console.error(`[binu] moveCursorToNextMonitor error: ${error}`);
+    static setCursorSize(size) {
+        try {
+            const settings = new Gio.Settings({ schema: 'org.gnome.desktop.interface' });
+            settings.set_int('cursor-size', size);
+        } catch (error) {
+            console.error(`[binu] Failed to set cursor size: ${error}`);
+        }
     }
 }

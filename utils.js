@@ -1,3 +1,6 @@
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 import GLib from 'gi://GLib';
 
 export class Timer {
@@ -39,5 +42,32 @@ export class Timer {
         });
         Timer._timeouts.add(id);
         return id;
+    }
+}
+
+export class ShortcutManager {
+    constructor(settings) {
+        this.settings = settings;
+        this.registered = new Set();
+    }
+
+    register(name, handler) {
+        if (!Main.wm.addKeybinding) return;
+
+        Main.wm.addKeybinding(
+            name,
+            this.settings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.ALL,
+            handler
+        );
+        this.registered.add(name);
+    }
+
+    unregisterAll() {
+        for (const name of this.registered) {
+            Main.wm.removeKeybinding(name);
+        }
+        this.registered.clear();
     }
 }

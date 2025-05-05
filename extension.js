@@ -1,42 +1,33 @@
-import Meta from 'gi://Meta';
-import Shell from 'gi://Shell';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import * as Swapper from './swapper.js';
-import * as Cursor from './cursor.js';
-import { Timer } from './utils.js'
+import { MonitorNavigator, Direction } from './monitor.js';
+import { Timer, ShortcutManager } from './utils.js';
+import { CursorConfig } from './cursor.js';
 
 export default class BinuExtension extends Extension {
     enable() {
-        Timer.enable()
+        Timer.enable();
         this._settings = this.getSettings();
         this._swapBinding = 'swap-hotkey';
         this._cursorBinding = 'cursor-hotkey';
-        this.originalCursorSize = Cursor.getCursorSize()
 
-        this._registerShortcut(this._swapBinding, () => Swapper.swapWindows());
-        this._registerShortcut(this._cursorBinding, () => Cursor.moveCursorToNextMonitor(this.originalCursorSize));
+        this.originalCursorSize = CursorConfig.getCursorSize();
+        this.navigation = new MonitorNavigator(this.originalCursorSize);
+        this.shortcuts = new ShortcutManager(this._settings);
+
+        this.shortcuts.register(this._swapBinding, () =>
+            this.navigation.swapWindowsWith(Direction.NEXT)
+        );
+        this.shortcuts.register(this._cursorBinding, () =>
+            this.navigation.navigateMonitor(Direction.NEXT)
+        );
 
         console.info('Binu extension enabled');
     }
 
     disable() {
-        Timer.disable()
-        Main.wm.removeKeybinding(this._swapBinding);
-        Main.wm.removeKeybinding(this._cursorBinding);
+        Timer.disable();
+        this.shortcuts.unregisterAll();
         this._settings = null;
         console.info('Binu extension disabled');
-    }
-
-    _registerShortcut(name, handler) {
-        if (!Main.wm.addKeybinding) return;
-
-        Main.wm.addKeybinding(
-            name,
-            this._settings,
-            Meta.KeyBindingFlags.NONE,
-            Shell.ActionMode.ALL,
-            handler
-        );
     }
 }
