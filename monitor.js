@@ -69,7 +69,6 @@ export class MonitorNavigator {
             const targetMonitor = this.getCurrentMonitor(monitor);
 
             if (targetMonitor === currentMonitor) {
-                console.info(`[binu] Source and target monitors are the same.`);
                 return;
             }
 
