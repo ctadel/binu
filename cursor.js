@@ -14,13 +14,10 @@ export class CursorAnimator {
     async animateTo(targetX, targetY) {
         try {
             CursorConfig.setCursorSize(this.zoomedCursorSize);
-            console.debug(`[binu] Cursor size increased to: ${this.zoomedCursorSize}`);
-
             await this._animateCursor(targetX, targetY);
 
             await Timer.sleep(100);
             CursorConfig.setCursorSize(this.originalCursorSize);
-            console.debug(`[binu] Cursor size restored to: ${this.originalCursorSize}`);
 
             await this._nudgeCursor(); // to force refresh
         } catch (error) {
@@ -43,8 +40,6 @@ export class CursorAnimator {
             await CommandRunner.runCommand(['xdotool', 'mousemove', x.toString(), y.toString()]);
             if (delay > 0) await Timer.sleep(delay);
         }
-
-        console.debug(`[binu] Cursor animated to (${targetX}, ${targetY})`);
     }
 
     async _nudgeCursor() {
