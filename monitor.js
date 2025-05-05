@@ -1,4 +1,7 @@
 import  { CursorAnimator } from './cursor.js';
+import CommandRunner from './commands.js';
+import { Preferences } from './utils.js'
+
 
 export const Direction = {
     NEXT: Symbol('next'),
@@ -6,14 +9,20 @@ export const Direction = {
 };
 
 export class MonitorNavigator {
-    constructor(cursor_size) {
+    constructor(settings, cursor_size) {
+        this.settings = new Preferences(settings)
         this.cursor_size = cursor_size;
     }
 
-    static getMonitor(monitor) {
+    getCurrentMonitor(monitor) {
         const display = global.display;
-        const currentMonitor = display.get_current_monitor();
         const totalMonitors = display.get_n_monitors();
+
+        let currentMonitor = display.get_current_monitor();
+        if(!this.settings.isMoveCursorEnabled()){
+            let focusedWindow = global.display.get_focus_window();
+            currentMonitor = focusedWindow ? focusedWindow.get_monitor() : null;
+        }
 
         if (monitor === Direction.NEXT) {
             return (currentMonitor + 1) % totalMonitors;
@@ -28,15 +37,23 @@ export class MonitorNavigator {
 
     async navigateMonitor(monitor) {
         try {
-            const targetMonitor = MonitorNavigator.getMonitor(monitor);
+            const targetMonitor = this.getCurrentMonitor(monitor);
             const geometry = global.display.get_monitor_geometry(targetMonitor);
             const centerX = geometry.x + geometry.width / 2;
             const centerY = geometry.y + geometry.height / 2;
 
-            this._focusMostRecentWindowOnMonitor(targetMonitor);
+            if (this.settings.isUpddateFocusEnabled()){
+                this._focusMostRecentWindowOnMonitor(targetMonitor);
+            }
 
-            const animator = new CursorAnimator(this.cursor_size);
-            await animator.animateTo(centerX, centerY);
+            if (!this.settings.isMoveCursorEnabled()) {return}
+
+            if (this.settings.isAnimateCursorEnabled()){
+                const animator = new CursorAnimator(this.cursor_size);
+                await animator.animateTo(centerX, centerY);
+            } else{
+                await CommandRunner.runCommand(['xdotool', 'mousemove', centerX.toString(), centerY.toString()]);
+            }
         } catch (error) {
             console.error(`[binu] navigateMonitor error: ${error}`);
         }
@@ -44,8 +61,12 @@ export class MonitorNavigator {
 
     swapWindowsWith(monitor) {
         try {
-            const currentMonitor = global.display.get_current_monitor();
-            const targetMonitor = MonitorNavigator.getMonitor(monitor);
+            let currentMonitor = global.display.get_current_monitor();
+            if(!this.settings.isMoveCursorEnabled()){
+                let focusedWindow = global.display.get_focus_window();
+                currentMonitor = focusedWindow ? focusedWindow.get_monitor() : null;
+            }
+            const targetMonitor = this.getCurrentMonitor(monitor);
 
             if (targetMonitor === currentMonitor) {
                 console.info(`[binu] Source and target monitors are the same.`);
@@ -64,7 +85,9 @@ export class MonitorNavigator {
                 win.move_to_monitor(currentMonitor);
             }
 
-            this._focusMostRecentWindowOnMonitor(currentMonitor);
+            if (this.settings.isUpddateFocusEnabled()){
+                this._focusMostRecentWindowOnMonitor(currentMonitor);
+            }
 
             console.debug(`[binu] Swapped windows between monitors ${currentMonitor} and ${targetMonitor}`);
         } catch (error) {

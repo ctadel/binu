@@ -71,3 +71,24 @@ export class ShortcutManager {
         this.registered.clear();
     }
 }
+
+export class Preferences{
+    constructor(settings){
+      this._settings = settings
+    }
+
+    isMoveCursorEnabled() {
+        // Move cursor while navigation
+        return this._settings.get_boolean('move-cursor');
+    }
+
+    isAnimateCursorEnabled() {
+        // Animate cursor movement
+        return this._settings.get_boolean('animate-cursor');
+    }
+
+    isUpddateFocusEnabled() {
+        // Do not change window focus
+        return this._settings.get_boolean('update-focus');
+    }
+}

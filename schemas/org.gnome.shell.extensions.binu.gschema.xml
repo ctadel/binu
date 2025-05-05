@@ -62,10 +62,10 @@
       <summary>Animate cursor movement</summary>
       <description>Whether to animate the cursor when moving between monitors</description>
     </key>
-    <key name="only-cursor" type="b">
-      <default>false</default>
-      <summary>Do not change window focus</summary>
-      <description>Only move the cursor without changing window focus</description>
+    <key name="update-focus" type="b">
+      <default>true</default>
+      <summary>Change window focus after an action</summary>
+      <description>Update the focus to the window on the navigated monitor</description>
     </key>
   </schema>
 </schemalist>
