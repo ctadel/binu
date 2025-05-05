@@ -1,18 +1,71 @@
 <schemalist>
   <schema id="org.gnome.shell.extensions.binu" path="/org/gnome/shell/extensions/binu/">
-    <key name="swap-hotkey" type="as">
-    <default><![CDATA[['<Control>F8']]]></default>
-        <summary>Hotkey for swapping windows between monitors</summary>
-        <description>
-            Key to run swap all applications between two monitors
-        </description>
+    <!-- Navigation Shortcuts -->
+    <key name="monitor-next" type="as">
+      <default>[]</default>
+      <summary>Navigate to next monitor</summary>
+      <description>Shortcut to navigate to the next monitor</description>
     </key>
-    <key name="cursor-hotkey" type="as">
-    <default><![CDATA[['<Control>F9']]]></default>
-        <summary>Hotkey for cycling cursor between monitors</summary>
-        <description>
-            Key to run move the cursor to next monitor
-        </description>
+    <key name="monitor-prev" type="as">
+      <default>[]</default>
+      <summary>Navigate to previous monitor</summary>
+      <description>Shortcut to navigate to the previous monitor</description>
+    </key>
+
+    <!-- Per-Monitor Shortcuts -->
+    <key name="monitor-0" type="as">
+      <default>[]</default>
+      <summary>Navigate to monitor 1</summary>
+      <description>Shortcut to navigate directly to monitor 1</description>
+    </key>
+    <key name="monitor-1" type="as"><default>[]</default></key>
+    <key name="monitor-2" type="as"><default>[]</default></key>
+    <key name="monitor-3" type="as"><default>[]</default></key>
+    <key name="monitor-4" type="as"><default>[]</default></key>
+    <key name="monitor-5" type="as"><default>[]</default></key>
+    <key name="monitor-6" type="as"><default>[]</default></key>
+    <key name="monitor-7" type="as"><default>[]</default></key>
+
+    <!-- Swap Shortcuts -->
+    <key name="swap-next" type="as">
+      <default>[]</default>
+      <summary>Swap windows with next monitor</summary>
+      <description>Shortcut to swap windows with the next monitor</description>
+    </key>
+    <key name="swap-prev" type="as">
+      <default>[]</default>
+      <summary>Swap windows with previous monitor</summary>
+      <description>Shortcut to swap windows with the previous monitor</description>
+    </key>
+
+    <key name="swap-0" type="as">
+      <default>[]</default>
+      <summary>Swap windows with monitor 1</summary>
+      <description>Shortcut to swap windows with the monitor 1</description>
+    </key>
+    <key name="swap-1" type="as"><default>[]</default></key>
+    <key name="swap-2" type="as"><default>[]</default></key>
+    <key name="swap-3" type="as"><default>[]</default></key>
+    <key name="swap-4" type="as"><default>[]</default></key>
+    <key name="swap-5" type="as"><default>[]</default></key>
+    <key name="swap-6" type="as"><default>[]</default></key>
+    <key name="swap-7" type="as"><default>[]</default></key>
+
+    <!-- Preferences -->
+    <key name="move-cursor" type="b">
+      <default>true</default>
+      <summary>Move cursor while navigation</summary>
+      <description>Whether to move the cursor when navigating between monitors</description>
+    </key>
+    <key name="animate-cursor" type="b">
+      <default>true</default>
+      <summary>Animate cursor movement</summary>
+      <description>Whether to animate the cursor when moving between monitors</description>
+    </key>
+    <key name="only-cursor" type="b">
+      <default>false</default>
+      <summary>Do not change window focus</summary>
+      <description>Only move the cursor without changing window focus</description>
     </key>
   </schema>
 </schemalist>

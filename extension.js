@@ -7,8 +7,8 @@ export default class BinuExtension extends Extension {
     enable() {
         Timer.enable();
         this._settings = this.getSettings();
-        this._swapBinding = 'swap-hotkey';
-        this._cursorBinding = 'cursor-hotkey';
+        this._swapBinding = 'swap-next';
+        this._cursorBinding = 'monitor-next';
 
         this.originalCursorSize = CursorConfig.getCursorSize();
         this.navigation = new MonitorNavigator(this.originalCursorSize);

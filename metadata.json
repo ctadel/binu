@@ -2,7 +2,7 @@
   "uuid": "binu@ctadel",
   "name": "Binu",
   "description": "Little Tweaks for GNOME for multiple monitors",
-  "version": 1,
+  "version": 3,
   "shell-version": ["45", "46", "47"],
   "url": "https://github.com/ctadel/binu",
   "settings-schema": "org.gnome.shell.extensions.binu"
