@@ -8,8 +8,8 @@ Whether you're juggling multiple monitors or want simple utilities to boost your
 
 ## ✨ Features
 
-### 🖱 Move Mouse Pointer to Next Monitor  
-Press a shortcut to instantly move the mouse pointer to the center of the next monitor in sequence.  
+### 🖱 Navigate between multiple monitors along with mouse pointer
+Press a shortcut to focus on (next/previous) monitor and move the mouse pointer
 Includes a visual animation with cursor resizing to make tracking easier.
 
 ### 🪟 Swap All Windows Between Two Monitors  
