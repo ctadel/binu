@@ -8,13 +8,13 @@ export class CursorAnimator {
     constructor(originalCursorSize, animationDuration = ANIMATION_DURATION_MS) {
         this.originalCursorSize = originalCursorSize;
         this.animationDuration = animationDuration;
+        this.zoomedCursorSize = originalCursorSize * 3
     }
 
     async animateTo(targetX, targetY) {
         try {
-            const increasedSize = this.originalCursorSize * 3;
-            this.setCursorSize(increasedSize);
-            console.debug(`[binu] Cursor size increased to: ${increasedSize}`);
+            this.setCursorSize(this.zoomedCursorSize);
+            console.debug(`[binu] Cursor size increased to: ${this.zoomedCursorSize}`);
 
             await this._animateCursor(targetX, targetY);
 
@@ -69,6 +69,17 @@ export function getCursorSize() {
     return settings.get_int('cursor-size');
 }
 
+function _focusMostRecentWindowOnMonitor(monitorIndex) {
+    const recentWindows = global.display.get_tab_list(0, null);
+
+    for (const win of recentWindows) {
+        if (!win.minimized && !win.skip_taskbar && win.get_monitor() === monitorIndex) {
+            win.activate(global.get_current_time());
+            return;
+        }
+    }
+}
+
 export async function moveCursorToNextMonitor(cursorSize) {
     try {
         const display = global.display;
@@ -79,6 +90,9 @@ export async function moveCursorToNextMonitor(cursorSize) {
         const geometry = display.get_monitor_geometry(nextMonitor);
         const centerX = geometry.x + geometry.width / 2;
         const centerY = geometry.y + geometry.height / 2;
+
+        //TODO: Add a condition based on user settings
+        _focusMostRecentWindowOnMonitor(nextMonitor);
 
         const animator = new CursorAnimator(cursorSize);
         await animator.animateTo(centerX, centerY);
