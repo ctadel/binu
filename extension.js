@@ -45,7 +45,10 @@ export default class BinuExtension extends Extension {
     disable() {
         Timer.disable();
         this.shortcuts.unregisterAll();
+        this.shortcuts = null
         this._settings = null;
+        this.navigation = null
+        this.originalCursorSize = null
         console.info('Binu extension disabled');
     }
 }
