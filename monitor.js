@@ -1,5 +1,5 @@
 import  { Cursor } from './cursor.js';
-import { Preferences } from './utils.js'
+import { Preferences, System } from './utils.js'
 
 
 export const Direction = {
@@ -10,6 +10,7 @@ export const Direction = {
 export class MonitorNavigator {
     constructor(settings) {
         this.settings = new Preferences(settings)
+        this.displaySession = System.getDisplaySession()
     }
 
     getCurrentMonitor(monitor) {
@@ -46,6 +47,7 @@ export class MonitorNavigator {
 
             if (!this.settings.isMoveCursorEnabled()) {return}
             await Cursor.setCursorPosition(
+                this.displaySession,
                 centerX, centerY,
                 this.settings.isAnimateCursorEnabled()
             )

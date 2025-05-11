@@ -1,12 +1,16 @@
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { MonitorNavigator, Direction } from './monitor.js';
-import { Timer, ShortcutManager } from './utils.js';
-import { Cursor } from './cursor.js';
+import { Timer, ShortcutManager, System } from './utils.js';
+import { Cursor, VirtualPointer } from './cursor.js';
 
 export default class BinuExtension extends Extension {
     enable() {
         Timer.enable();
         this._settings = this.getSettings();
+        if (System.getDisplaySession() === 'wayland') {
+            VirtualPointer.initVirtualPointer()
+            Cursor.wayland_pointer = VirtualPointer.virtualPointer
+        }
         Cursor.originalCursorSize = Cursor.getCursorSize();
         this.navigation = new MonitorNavigator(this._settings);
         this.shortcuts = new ShortcutManager(this._settings);
@@ -45,10 +49,12 @@ export default class BinuExtension extends Extension {
     disable() {
         Timer.disable();
         this.shortcuts.unregisterAll();
+        if (System.getDisplaySession() === 'wayland')
+            VirtualPointer.destroyVirtualPointer()
+            Cursor.wayland_pointer = null
         this.shortcuts = null
-        this._settings = null;
         this.navigation = null
-        this.originalCursorSize = null
+        Cursor.originalCursorSize = null
         console.info('Binu extension disabled');
     }
 }

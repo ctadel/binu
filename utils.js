@@ -92,3 +92,13 @@ export class Preferences{
         return this._settings.get_boolean('update-focus');
     }
 }
+
+export class System {
+  static isX11Display() {
+    return GLib.getenv('XDG_SESSION_TYPE') === 'x11';
+  }
+
+  static getDisplaySession() {
+    return GLib.getenv('XDG_SESSION_TYPE')
+  }
+}
