@@ -1,5 +1,4 @@
-import  { CursorAnimator } from './cursor.js';
-import CommandRunner from './commands.js';
+import  { CursorConfig, CursorAnimator } from './cursor.js';
 import { Preferences } from './utils.js'
 
 
@@ -52,7 +51,7 @@ export class MonitorNavigator {
                 const animator = new CursorAnimator(this.cursor_size);
                 await animator.animateTo(centerX, centerY);
             } else{
-                await CommandRunner.runCommand(['xdotool', 'mousemove', centerX.toString(), centerY.toString()]);
+                await CursorConfig.setCursorPosition(centerX, centerY)
             }
         } catch (error) {
             console.error(`[binu] navigateMonitor error: ${error}`);

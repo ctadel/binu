@@ -37,16 +37,16 @@ export class CursorAnimator {
             if (!Timer.enabled) return;
             const x = Math.round(startX + dx * (i / steps));
             const y = Math.round(startY + dy * (i / steps));
-            await CommandRunner.runCommand(['xdotool', 'mousemove', x.toString(), y.toString()]);
+            await CursorConfig.setCursorPosition(x, y)
             if (delay > 0) await Timer.sleep(delay);
         }
     }
 
     async _nudgeCursor() {
         const [x, y] = global.get_pointer();
-        await CommandRunner.runCommand(['xdotool', 'mousemove', (x + 1).toString(), y.toString()]);
+        await CursorConfig.setCursorPosition(x + 1, y)
         await Timer.sleep(50);
-        await CommandRunner.runCommand(['xdotool', 'mousemove', x.toString(), y.toString()]);
+        await CursorConfig.setCursorPosition(x, y)
     }
 }
 
@@ -63,5 +63,9 @@ export class CursorConfig {
         } catch (error) {
             console.error(`[binu] Failed to set cursor size: ${error}`);
         }
+    }
+
+    static async setCursorPosition(x_axis, y_axis) {
+        await CommandRunner.runCommand(['xdotool', 'mousemove', x_axis.toString(), y_axis.toString()]);
     }
 }
