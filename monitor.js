@@ -1,4 +1,4 @@
-import  { CursorConfig, CursorAnimator } from './cursor.js';
+import  { Cursor } from './cursor.js';
 import { Preferences } from './utils.js'
 
 
@@ -8,9 +8,8 @@ export const Direction = {
 };
 
 export class MonitorNavigator {
-    constructor(settings, cursor_size) {
+    constructor(settings) {
         this.settings = new Preferences(settings)
-        this.cursor_size = cursor_size;
     }
 
     getCurrentMonitor(monitor) {
@@ -46,13 +45,10 @@ export class MonitorNavigator {
             }
 
             if (!this.settings.isMoveCursorEnabled()) {return}
-
-            if (this.settings.isAnimateCursorEnabled()){
-                const animator = new CursorAnimator(this.cursor_size);
-                await animator.animateTo(centerX, centerY);
-            } else{
-                await CursorConfig.setCursorPosition(centerX, centerY)
-            }
+            await Cursor.setCursorPosition(
+                centerX, centerY,
+                this.settings.isAnimateCursorEnabled()
+            )
         } catch (error) {
             console.error(`[binu] navigateMonitor error: ${error}`);
         }

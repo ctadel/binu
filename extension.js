@@ -1,14 +1,14 @@
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { MonitorNavigator, Direction } from './monitor.js';
 import { Timer, ShortcutManager } from './utils.js';
-import { CursorConfig } from './cursor.js';
+import { Cursor } from './cursor.js';
 
 export default class BinuExtension extends Extension {
     enable() {
         Timer.enable();
         this._settings = this.getSettings();
-        this.originalCursorSize = CursorConfig.getCursorSize();
-        this.navigation = new MonitorNavigator(this._settings, this.originalCursorSize);
+        Cursor.originalCursorSize = Cursor.getCursorSize();
+        this.navigation = new MonitorNavigator(this._settings);
         this.shortcuts = new ShortcutManager(this._settings);
 
         // Binding Window Navigation shortcuts

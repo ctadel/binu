@@ -13,11 +13,11 @@ export class CursorAnimator {
 
     async animateTo(targetX, targetY) {
         try {
-            CursorConfig.setCursorSize(this.zoomedCursorSize);
+            Cursor.setCursorSize(this.zoomedCursorSize);
             await this._animateCursor(targetX, targetY);
 
             await Timer.sleep(100);
-            CursorConfig.setCursorSize(this.originalCursorSize);
+            Cursor.setCursorSize(this.originalCursorSize);
 
             await this._nudgeCursor(); // to force refresh
         } catch (error) {
@@ -37,20 +37,23 @@ export class CursorAnimator {
             if (!Timer.enabled) return;
             const x = Math.round(startX + dx * (i / steps));
             const y = Math.round(startY + dy * (i / steps));
-            await CursorConfig.setCursorPosition(x, y)
+            await Cursor.setCursorPosition(x, y)
             if (delay > 0) await Timer.sleep(delay);
         }
     }
 
     async _nudgeCursor() {
         const [x, y] = global.get_pointer();
-        await CursorConfig.setCursorPosition(x + 1, y)
+        await Cursor.setCursorPosition(x + 1, y)
         await Timer.sleep(50);
-        await CursorConfig.setCursorPosition(x, y)
+        await Cursor.setCursorPosition(x, y)
     }
 }
 
-export class CursorConfig {
+export class Cursor {
+
+    static originalCursorSize = null
+
     static getCursorSize() {
         const settings = new Gio.Settings({ schema: 'org.gnome.desktop.interface' });
         return settings.get_int('cursor-size');
@@ -65,7 +68,12 @@ export class CursorConfig {
         }
     }
 
-    static async setCursorPosition(x_axis, y_axis) {
-        await CommandRunner.runCommand(['xdotool', 'mousemove', x_axis.toString(), y_axis.toString()]);
+    static async setCursorPosition(x_axis, y_axis, animation = false) {
+        if (animation) {
+            const animator = new CursorAnimator(Cursor.originalCursorSize);
+            await animator.animateTo(x_axis, y_axis);
+        } else {
+            await CommandRunner.runCommand(['xdotool', 'mousemove', x_axis.toString(), y_axis.toString()]);
+        }
     }
 }
