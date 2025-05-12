@@ -62,10 +62,18 @@
       <summary>Animate cursor movement</summary>
       <description>Whether to animate the cursor when moving between monitors</description>
     </key>
+    <key name="animate-cursor-duration" type="i">
+      <default>100</default>
+      <summary>Cursor Animation Duration (ms)</summary>
+      <description>Duration of the cursor animation in milliseconds.</description>
+    </key>
+
     <key name="update-focus" type="b">
       <default>true</default>
       <summary>Change window focus after an action</summary>
       <description>Update the focus to the window on the navigated monitor</description>
     </key>
+
+
   </schema>
 </schemalist>

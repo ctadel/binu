@@ -91,6 +91,10 @@ export class Preferences{
         // Do not change window focus
         return this._settings.get_boolean('update-focus');
     }
+
+    getAnimationDuration() {
+        return this._settings.get_int('animate-cursor-duration');
+    }
 }
 
 export class System {

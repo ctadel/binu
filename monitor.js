@@ -1,4 +1,4 @@
-import  { Cursor } from './cursor.js';
+import { Cursor } from './cursor.js';
 import { Preferences, System } from './utils.js'
 
 
@@ -10,10 +10,9 @@ export const Direction = {
 export class MonitorNavigator {
     constructor(settings) {
         this.settings = new Preferences(settings)
-        this.displaySession = System.getDisplaySession()
     }
 
-    getCurrentMonitor(monitor) {
+    getTargetMonitor(monitor) {
         const display = global.display;
         const totalMonitors = display.get_n_monitors();
 
@@ -23,20 +22,19 @@ export class MonitorNavigator {
             currentMonitor = focusedWindow ? focusedWindow.get_monitor() : null;
         }
 
-        if (monitor === Direction.NEXT) {
+        if (monitor === Direction.NEXT)
             return (currentMonitor + 1) % totalMonitors;
-        } else if (monitor === Direction.PREVIOUS) {
+        else if (monitor === Direction.PREVIOUS)
             return (currentMonitor - 1 + totalMonitors) % totalMonitors;
-        } else if (Number.isInteger(monitor) && monitor >= 0 && monitor < totalMonitors) {
+        else if (Number.isInteger(monitor) && monitor >= 0 && monitor < totalMonitors)
             return monitor;
-        } else {
+        else
             throw new Error(`Invalid monitor argument: ${monitor}`);
-        }
     }
 
     async navigateMonitor(monitor) {
         try {
-            const targetMonitor = this.getCurrentMonitor(monitor);
+            const targetMonitor = this.getTargetMonitor(monitor);
             const geometry = global.display.get_monitor_geometry(targetMonitor);
             const centerX = geometry.x + geometry.width / 2;
             const centerY = geometry.y + geometry.height / 2;
@@ -47,9 +45,8 @@ export class MonitorNavigator {
 
             if (!this.settings.isMoveCursorEnabled()) {return}
             await Cursor.setCursorPosition(
-                this.displaySession,
                 centerX, centerY,
-                this.settings.isAnimateCursorEnabled()
+                this.settings
             )
         } catch (error) {
             console.error(`[binu] navigateMonitor error: ${error}`);
@@ -63,7 +60,7 @@ export class MonitorNavigator {
                 let focusedWindow = global.display.get_focus_window();
                 currentMonitor = focusedWindow ? focusedWindow.get_monitor() : null;
             }
-            const targetMonitor = this.getCurrentMonitor(monitor);
+            const targetMonitor = this.getTargetMonitor(monitor);
 
             if (targetMonitor === currentMonitor) {
                 return;

@@ -7,10 +7,8 @@ export default class BinuExtension extends Extension {
     enable() {
         Timer.enable();
         this._settings = this.getSettings();
-        if (System.getDisplaySession() === 'wayland') {
-            VirtualPointer.initVirtualPointer()
-            Cursor.wayland_pointer = VirtualPointer.virtualPointer
-        }
+        VirtualPointer.initVirtualPointer()
+        Cursor.pointer = VirtualPointer.virtualPointer
         Cursor.originalCursorSize = Cursor.getCursorSize();
         this.navigation = new MonitorNavigator(this._settings);
         this.shortcuts = new ShortcutManager(this._settings);
@@ -49,12 +47,11 @@ export default class BinuExtension extends Extension {
     disable() {
         Timer.disable();
         this.shortcuts.unregisterAll();
-        if (System.getDisplaySession() === 'wayland')
-            VirtualPointer.destroyVirtualPointer()
-            Cursor.wayland_pointer = null
+        VirtualPointer.destroyVirtualPointer()
+        Cursor.pointer = null
+        Cursor.originalCursorSize = null
         this.shortcuts = null
         this.navigation = null
-        Cursor.originalCursorSize = null
         console.info('Binu extension disabled');
     }
 }

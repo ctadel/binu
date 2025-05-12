@@ -101,24 +101,54 @@ class PreferencesSettings {
             icon_name: 'preferences-system-symbolic'
         });
 
-        const group = new Adw.PreferencesGroup({ title: _('Behavior') });
+        const cursorGroup = new Adw.PreferencesGroup({ title: _('Cursor Settings') });
+        const focusGroup = new Adw.PreferencesGroup({ title: _('Window Focus Settings') });
 
-        const moveCursorSwitch = new Gtk.Switch({
+        const cursorMovementSwitch = new Gtk.Switch({
             active: this.schema.get_boolean('move-cursor'),
             valign: Gtk.Align.CENTER
         });
-        const moveCursorRow = new Adw.ActionRow({ title: _('Move cursor while navigating') });
-        moveCursorRow.add_suffix(moveCursorSwitch);
-        moveCursorRow.activatable_widget = moveCursorSwitch;
+        const cursorMovementRow = new Adw.ActionRow({ title: _('Move cursor while navigating') });
+        cursorMovementRow.add_suffix(cursorMovementSwitch);
+        cursorMovementRow.activatable_widget = cursorMovementSwitch;
 
-        const animateCursorSwitch = new Gtk.Switch({
-            active: this.schema.get_boolean('animate-cursor'),
-            sensitive: moveCursorSwitch.active,
-            valign: Gtk.Align.CENTER
+        cursorMovementSwitch.connect('notify::active', () => {
+            this.schema.set_boolean('move-cursor', cursorMovementSwitch.active);
         });
-        const animateCursorRow = new Adw.ActionRow({ title: _('Animate cursor while moving') });
-        animateCursorRow.add_suffix(animateCursorSwitch);
-        animateCursorRow.activatable_widget = animateCursorSwitch;
+        cursorGroup.add(cursorMovementRow)
+
+        const cursorAnimation = new Adw.ExpanderRow({
+            title: _('Animate cursor while while cursor movement'),
+            show_enable_switch: true,
+            expanded: false,
+            enable_expansion: this.schema.get_boolean('animate-cursor'),
+        });
+        cursorAnimation.connect('notify::enable-expansion', widget => {
+            this.schema.set_boolean('animate-cursor', widget.enable_expansion);
+        });
+        cursorGroup.add(cursorAnimation);
+
+        const animationDuration = new Gtk.SpinButton({
+            adjustment: new Gtk.Adjustment({
+                lower: 50, upper: 1000, step_increment: 1, page_increment: 1, page_size: 0,
+            }),
+            climb_rate: 1,
+            digits: 0,
+            numeric: true,
+            valign: Gtk.Align.CENTER,
+        });
+        animationDuration.set_value(this.schema.get_int('animate-cursor-duration'));
+        animationDuration.connect('value-changed', widget => {
+            this.schema.set_int('animate-cursor-duration', widget.get_value());
+        });
+
+        const animationDurationRow = new Adw.ActionRow({
+            title: _('Animation Duration'),
+            subtitle: _('Animation duration to move cursor from one monitor to another (ms)'),
+            activatable_widget: animationDuration,
+        });
+        animationDurationRow.add_suffix(animationDuration);
+        cursorAnimation.add_row(animationDurationRow);
 
         const updateFocusAfterNavigation = new Gtk.Switch({
             active: this.schema.get_boolean('update-focus'),
@@ -128,24 +158,14 @@ class PreferencesSettings {
         changeFocus.add_suffix(updateFocusAfterNavigation);
         changeFocus.activatable_widget = updateFocusAfterNavigation;
 
-        moveCursorSwitch.connect('notify::active', () => {
-            this.schema.set_boolean('move-cursor', moveCursorSwitch.active);
-            animateCursorSwitch.set_sensitive(moveCursorSwitch.active);
-        });
-
-        animateCursorSwitch.connect('notify::active', () => {
-            this.schema.set_boolean('animate-cursor', animateCursorSwitch.active);
-        });
-
         updateFocusAfterNavigation.connect('notify::active', () => {
             this.schema.set_boolean('update-focus', updateFocusAfterNavigation.active);
         });
 
-        group.add(moveCursorRow);
-        group.add(animateCursorRow);
-        group.add(changeFocus);
+        focusGroup.add(changeFocus);
 
-        this.page.add(group);
+        this.page.add(cursorGroup);
+        this.page.add(focusGroup);
     }
 }
 

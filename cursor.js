@@ -1,14 +1,10 @@
 import Gio from 'gi://Gio';
 import Clutter from 'gi://Clutter';
-import CommandRunner from './commands.js';
 import { Timer } from './utils.js';
 
-
-const ANIMATION_DURATION_MS = 50;
-
 export class CursorAnimator {
-    constructor(displaySession) {
-        this.displaySession = displaySession
+    constructor(animationDuration) {
+        this.animationDuration = animationDuration
         this.zoomedCursorSize = Cursor.originalCursorSize * 3
     }
 
@@ -17,7 +13,7 @@ export class CursorAnimator {
             Cursor.setCursorSize(this.zoomedCursorSize);
             await this._animateCursor(targetX, targetY);
 
-            await Timer.sleep(100);
+            await Timer.sleep(30);
             Cursor.setCursorSize(Cursor.originalCursorSize);
 
             await this._nudgeCursor(); // to force refresh
@@ -33,22 +29,22 @@ export class CursorAnimator {
         const dy = targetY - startY;
 
         const steps = 30;
-        const delay = Math.floor(ANIMATION_DURATION_MS / steps);
+        const delay = Math.floor(this.animationDuration / steps);
 
         for (let i = 0; i <= steps; i++) {
             if (!Timer.enabled) return;
             const x = Math.round(startX + dx * (i / steps));
             const y = Math.round(startY + dy * (i / steps));
-            await Cursor._setCursorPosition(this.displaySession, x, y)
+            await Cursor._setCursorPosition(x, y)
             if (delay > 0) await Timer.sleep(delay);
         }
     }
 
     async _nudgeCursor() {
         const [x, y] = global.get_pointer();
-        await Cursor._setCursorPosition(this.displaySession, x + 1, y)
+        await Cursor._setCursorPosition(x + 1, y)
         await Timer.sleep(50);
-        await Cursor._setCursorPosition(this.displaySession, x, y)
+        await Cursor._setCursorPosition(x, y)
     }
 }
 
@@ -74,7 +70,7 @@ export class Cursor {
 
     // Initialized these static variables in the Extension's enable()
     static originalCursorSize = null
-    static wayland_pointer = null
+    static pointer = null
 
     static getCursorSize() {
         const settings = new Gio.Settings({ schema: 'org.gnome.desktop.interface' });
@@ -90,21 +86,19 @@ export class Cursor {
         }
     }
 
-    static async _setCursorPosition(displaySession, x_axis, y_axis) {
-        if (displaySession === 'x11'){
-            await CommandRunner.runCommand(['xdotool', 'mousemove', x_axis.toString(), y_axis.toString()]);
-        } else {
-            const timestamp = global.get_current_time();
-            Cursor.wayland_pointer.notify_absolute_motion(timestamp, x_axis, y_axis);
-        }
+    static async _setCursorPosition(x_axis, y_axis) {
+        const timestamp = global.get_current_time();
+        Cursor.pointer.notify_absolute_motion(timestamp, x_axis, y_axis);
     }
 
-    static async setCursorPosition(displaySession, x_axis, y_axis, animation = false) {
-        if (animation) {
-            const animator = new CursorAnimator(displaySession);
+    static async setCursorPosition(x_axis, y_axis, settings) {
+        const animationEnabled = settings.isAnimateCursorEnabled()
+        if (animationEnabled) {
+            const animationDuration = settings.getAnimationDuration()
+            const animator = new CursorAnimator(animationDuration);
             await animator.animateTo(x_axis, y_axis);
         } else {
-            await Cursor._setCursorPosition(displaySession, x_axis, y_axis)
+            await Cursor._setCursorPosition(x_axis, y_axis)
         }
     }
 }
