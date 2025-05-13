@@ -20,14 +20,7 @@ More tweaks and utilities are planned in future updates — including window til
 ---
 
 ## ⚙️ Requirements
-
-- [`xdotool`](https://manpages.ubuntu.com/manpages/latest/en/man1/xdotool.1.html)  
-  Used for controlling the mouse pointer programmatically.
-
-Install it via your package manager:  
-```bash
-sudo apt install xdotool
-```
+This extension doesn't have any dependency on third party libraries.
 
 ---
 
