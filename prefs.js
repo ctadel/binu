@@ -62,14 +62,14 @@ class HomeSettings {
         const monitorCount = monitors.get_n_items();
 
         for (let i = 0; i < monitorCount; i++) {
-            this.addShortcut(group, `monitor-${i}`, _(`Navigate to monitor ${i + 1} [${_getMonitorName(i)}]`));
+            this.addShortcut(group, `monitor-${i}`, _(`Navigate to monitor ${i + 1}`), `Directly jump to the screen: ${_getMonitorName(i)}`);
         }
 
         this.page.add(group);
     }
 
     buildSwapSettings() {
-        const group = new Adw.PreferencesGroup({ title: _('Swap Windows Between Monitors') });
+        const group = new Adw.PreferencesGroup({ title: _('Swap all the Applications between Monitors') });
 
         this.addShortcut(group, 'swap-next', _('Swap with next monitor'));
         this.addShortcut(group, 'swap-prev', _('Swap with previous monitor'));
@@ -79,14 +79,14 @@ class HomeSettings {
         const monitorCount = monitors.get_n_items();
 
         for (let i = 0; i < monitorCount; i++) {
-            this.addShortcut(group, `swap-${i}`, _(`Swap to monitor ${i + 1} [${_getMonitorName(i)}]`));
+            this.addShortcut(group, `swap-${i}`, _(`Swap to monitor ${i + 1}`), `Swap all applications from current monitor with ${_getMonitorName(i)}`);
         }
 
         this.page.add(group);
     }
 
-    addShortcut(group, key, title) {
-        const row = new Adw.ActionRow({ title });
+    addShortcut(group, key, title, subtitle = '') {
+        const row = new Adw.ActionRow({ title:title , subtitle:subtitle});
         const button = createShortcutButton(this.schema, key);
         row.add_suffix(button);
         group.add(row);
@@ -108,7 +108,7 @@ class PreferencesSettings {
             active: this.schema.get_boolean('move-cursor'),
             valign: Gtk.Align.CENTER
         });
-        const cursorMovementRow = new Adw.ActionRow({ title: _('Move cursor while navigating') });
+        const cursorMovementRow = new Adw.ActionRow({ title: _('Move cursor while navigating'), subtitle: _('Do you also want to move your cursor while navigating to target monitor?')});
         cursorMovementRow.add_suffix(cursorMovementSwitch);
         cursorMovementRow.activatable_widget = cursorMovementSwitch;
 
@@ -154,7 +154,7 @@ class PreferencesSettings {
             active: this.schema.get_boolean('update-focus'),
             valign: Gtk.Align.CENTER
         });
-        const changeFocus = new Adw.ActionRow({ title: _('Update the focus to the window on the navigated monitor') });
+        const changeFocus = new Adw.ActionRow({ title: _('Update the focus to the window on the navigated monitor'), subtitle: _('This focuses on the most recent window in your target monitor while navigating') });
         changeFocus.add_suffix(updateFocusAfterNavigation);
         changeFocus.activatable_widget = updateFocusAfterNavigation;
 
@@ -222,8 +222,11 @@ class AboutPage extends Adw.PreferencesPage {
         const githubRow = this._createLinkRow(_('%s on Github').format(PROJECT_NAME), `${metadata.url}`);
         infoGroup.add(githubRow);
 
-        const reportIssueRow = this._createLinkRow(_('Report an Issue'), `${metadata.url}/issues/new`);
+        const reportIssueRow = this._createLinkRow(_('Report an Issue'), `${metadata.url}/issues/new`, 'Please add an issue to our github repository if you\'re faceing any problems')
         infoGroup.add(reportIssueRow);
+
+        const commentsRow = this._createLinkRow(_('Loving this extension?'), `https://extensions.gnome.org/extension/8091/binu/`, 'Show us some love by leaving a comment and rating our extension')
+        infoGroup.add(commentsRow);
 
         const miscGroup = new Adw.PreferencesGroup();
         this.add(miscGroup);

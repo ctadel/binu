@@ -88,6 +88,16 @@ export class MonitorNavigator {
         }
     }
 
+    lockCursorToCurrentMonitor() {
+        try {
+            let currentMonitor = global.display.get_current_monitor();
+            log(`The current monitor is : ${currentMonitor}`)
+
+        } catch (error) {
+            console.error(`[binu] swapWindowsWith error: ${error}`);
+        }
+    }
+
     _focusMostRecentWindowOnMonitor(monitorIndex) {
         const recentWindows = global.display.get_tab_list(0, null);
         for (const win of recentWindows) {
