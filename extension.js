@@ -1,6 +1,6 @@
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { MonitorNavigator, Direction } from './monitor.js';
-import { Timer, ShortcutManager, System } from './utils.js';
+import { Timer, ShortcutManager } from './utils.js';
 import { Cursor, VirtualPointer } from './cursor.js';
 
 export default class BinuExtension extends Extension {

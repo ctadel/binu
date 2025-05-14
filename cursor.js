@@ -92,8 +92,7 @@ export class Cursor {
     }
 
     static async setCursorPosition(x_axis, y_axis, settings) {
-        const animationEnabled = settings.isAnimateCursorEnabled()
-        if (animationEnabled) {
+        if (settings.isAnimateCursorEnabled()) {
             const animationDuration = settings.getAnimationDuration()
             const animator = new CursorAnimator(animationDuration);
             await animator.animateTo(x_axis, y_axis);

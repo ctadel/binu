@@ -1,5 +1,5 @@
 import { Cursor } from './cursor.js';
-import { Preferences, System } from './utils.js'
+import { Preferences } from './utils.js'
 
 
 export const Direction = {
@@ -83,16 +83,6 @@ export class MonitorNavigator {
             }
 
             console.debug(`[binu] Swapped windows between monitors ${currentMonitor} and ${targetMonitor}`);
-        } catch (error) {
-            console.error(`[binu] swapWindowsWith error: ${error}`);
-        }
-    }
-
-    lockCursorToCurrentMonitor() {
-        try {
-            let currentMonitor = global.display.get_current_monitor();
-            log(`The current monitor is : ${currentMonitor}`)
-
         } catch (error) {
             console.error(`[binu] swapWindowsWith error: ${error}`);
         }

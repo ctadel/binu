@@ -1,6 +1,6 @@
 # Binu — Little Tweaks for GNOME
 
-**Binu** is a minimal GNOME Shell extension focused on small, practical tweaks that improve your day-to-day desktop experience. It’s designed to be lightweight, modular, and helpful — adding just the right amount of automation and customization without getting in your way.
+**Binu** is a GNOME Shell extension focused on small, practical tweaks that improve your day-to-day desktop experience. It’s designed to be lightweight, modular, and helpful — adding just the right amount of automation and customization without getting in your way.
 
 Whether you're juggling multiple monitors or want simple utilities to boost your GNOME workflow, Binu aims to be your silent sidekick.
 

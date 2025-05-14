@@ -79,7 +79,7 @@ class HomeSettings {
         const monitorCount = monitors.get_n_items();
 
         for (let i = 0; i < monitorCount; i++) {
-            this.addShortcut(group, `swap-${i}`, _(`Swap to monitor ${i + 1}`), `Swap all applications from current monitor with ${_getMonitorName(i)}`);
+            this.addShortcut(group, `swap-${i}`, _(`Swap with monitor ${i + 1}`), `Swap all applications from current monitor with ${_getMonitorName(i)}`);
         }
 
         this.page.add(group);
