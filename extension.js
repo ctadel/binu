@@ -1,5 +1,5 @@
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import { MonitorNavigator, Direction, MonitorHandler } from './monitor.js';
+import { MonitorNavigator, Direction, MonitorHandler, MonitorUIBridge } from './monitor.js';
 import { Timer, ShortcutManager } from './utils.js';
 import { Cursor, VirtualPointer } from './cursor.js';
 
@@ -13,6 +13,11 @@ export default class BinuExtension extends Extension {
         Cursor.originalCursorSize = Cursor.getCursorSize();
         this.navigation = new MonitorNavigator(this._settings);
         this.shortcuts = new ShortcutManager(this._settings);
+
+        const monitorBridge = MonitorUIBridge.getInstance()
+        monitorBridge.onMonitorsUpdated(() => {
+            console.debug(`Updated monitors: ${monitorBridge.getMonitors()}`);
+        });
 
         // Binding Window Navigation shortcuts
         this.shortcuts.register('monitor-next', () =>

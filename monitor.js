@@ -1,4 +1,5 @@
 import Gio from 'gi://Gio';
+import GObject from 'gi://GObject';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Cursor } from './cursor.js';
 import { Preferences } from './utils.js'
@@ -175,6 +176,7 @@ export class MonitorHandler{
                 MonitorHandler._settings.set_string('monitor-config', jsonMonitors);
 
                 callback(monitorDetails);
+                MonitorUIBridge.getInstance().emitMonitorsUpdated('monitors-updated');
             } catch (e) {
                 log('Error in GetCurrentStateAsync: ' + e.message);
                 callback([]);
@@ -212,3 +214,35 @@ export class MonitorHandler{
         return MonitorHandler._monitors;
     }
 }
+
+export const MonitorUIBridge = GObject.registerClass({
+    Signals: {
+        'monitors-updated': {},
+    },
+}, class MonitorUIBridge extends GObject.Object {
+    static _instance;
+    static getInstance() {
+        if (!MonitorUIBridge._instance) {
+            MonitorUIBridge._instance = new MonitorUIBridge();
+        }
+        return MonitorUIBridge._instance;
+    }
+
+    _monitorsUpdatedSignalId = null;
+
+    onMonitorsUpdated(callback) {
+        if (this._monitorsUpdatedSignalId) {
+            this.disconnect(this._monitorsUpdatedSignalId);
+        }
+
+        this._monitorsUpdatedSignalId = this.connect('monitors-updated', callback);
+    }
+
+    emitMonitorsUpdated() {
+        this.emit('monitors-updated');
+    }
+
+    getMonitors() {
+        return MonitorHandler.getMonitors();
+    }
+});
