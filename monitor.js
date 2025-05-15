@@ -134,7 +134,7 @@ export class MonitorHandler{
     static _fetchMonitorDetails(callback) {
         MonitorHandler._createDisplayConfigProxy(async (proxy, error) => {
             if (error) {
-                log('Error creating proxy: ' + error.message);
+                console.error('Error creating proxy: ' + error.message);
                 callback([]);
                 return;
             }
@@ -178,7 +178,7 @@ export class MonitorHandler{
                 callback(monitorDetails);
                 MonitorUIBridge.getInstance().emitMonitorsUpdated('monitors-updated');
             } catch (e) {
-                log('Error in GetCurrentStateAsync: ' + e.message);
+                console.error('Error in GetCurrentStateAsync: ' + e.message);
                 callback([]);
             }
         });
@@ -195,7 +195,6 @@ export class MonitorHandler{
         }
 
         MonitorHandler._signalId = Main.layoutManager.connect('monitors-changed', () => {
-            log('Monitor change detected. Updating monitor list...');
             MonitorHandler.updateMonitorList();
         });
 
@@ -206,7 +205,6 @@ export class MonitorHandler{
         if (MonitorHandler._signalId !== null) {
             Main.layoutManager.disconnect(MonitorHandler._signalId);
             MonitorHandler._signalId = null;
-            log('MonitorHandler: stopped watching monitor layout changes');
         }
     }
 
