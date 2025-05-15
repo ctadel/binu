@@ -26,9 +26,17 @@ class HomeSettings {
             title: _('Home'),
             icon_name: 'go-home-symbolic'
         });
+        this.navSettings = null
+        this.swapSettings = null
 
         this.buildNavigationSettings();
         this.buildSwapSettings();
+        schema.connect('changed::monitor-config', () => {
+            log("monitors change triggered")
+            this.buildNavigationSettings();
+            this.buildSwapSettings();
+        });
+
     }
 
     _getMonitors() {
@@ -40,7 +48,11 @@ class HomeSettings {
     }
 
     buildNavigationSettings() {
+        if (this.navSettings) {
+            this.page.remove(this.navSettings)
+        }
         const group = new Adw.PreferencesGroup({ title: _('Navigate Monitors') });
+        this.navSettings = group
 
         this.addShortcut(group, 'monitor-next', _('Navigate to next monitor'));
         this.addShortcut(group, 'monitor-prev', _('Navigate to previous monitor'));
@@ -56,7 +68,11 @@ class HomeSettings {
     }
 
     buildSwapSettings() {
+        if (this.swapSettings) {
+            this.page.remove(this.swapSettings)
+        }
         const group = new Adw.PreferencesGroup({ title: _('Swap all the Applications between Monitors') });
+        this.swapSettings = group
 
         this.addShortcut(group, 'swap-next', _('Swap with next monitor'));
         this.addShortcut(group, 'swap-prev', _('Swap with previous monitor'));
