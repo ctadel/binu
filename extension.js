@@ -1,5 +1,5 @@
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import { MonitorNavigator, Direction } from './monitor.js';
+import { MonitorNavigator, Direction, MonitorHandler } from './monitor.js';
 import { Timer, ShortcutManager } from './utils.js';
 import { Cursor, VirtualPointer } from './cursor.js';
 
@@ -8,6 +8,7 @@ export default class BinuExtension extends Extension {
         Timer.enable();
         this._settings = this.getSettings();
         VirtualPointer.initVirtualPointer()
+        MonitorHandler.startWatching(this._settings);
         Cursor.pointer = VirtualPointer.virtualPointer
         Cursor.originalCursorSize = Cursor.getCursorSize();
         this.navigation = new MonitorNavigator(this._settings);
@@ -15,8 +16,7 @@ export default class BinuExtension extends Extension {
 
         // Binding Window Navigation shortcuts
         this.shortcuts.register('monitor-next', () =>
-            this.navigation.navigateMonitor(Direction.NEXT)
-        );
+            this.navigation.navigateMonitor(Direction.NEXT))
         this.shortcuts.register('monitor-prev', () =>
             this.navigation.navigateMonitor(Direction.PREVIOUS)
         );
@@ -48,6 +48,7 @@ export default class BinuExtension extends Extension {
         Timer.disable();
         this.shortcuts.unregisterAll();
         VirtualPointer.destroyVirtualPointer()
+        MonitorHandler.stopWatching()
         Cursor.pointer = null
         Cursor.originalCursorSize = null
         this.shortcuts = null

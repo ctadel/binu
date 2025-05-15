@@ -1,3 +1,5 @@
+import Gio from 'gi://Gio';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Cursor } from './cursor.js';
 import { Preferences } from './utils.js'
 
@@ -96,5 +98,117 @@ export class MonitorNavigator {
                 return;
             }
         }
+    }
+}
+
+export class MonitorHandler{
+    static _monitors = [];
+    static _settings = null;
+    static _signalId = null;
+
+    static _getDisplayConfigInterface() {
+        return `
+        <node>
+          <interface name="org.gnome.Mutter.DisplayConfig">
+            <method name="GetCurrentState">
+              <arg type="u" direction="out" name="serial"/>
+              <arg type="a((ssss)a(siiddada{sv})a{sv})" direction="out" name="monitors"/>
+              <arg type="a(iiduba(ssss)a{sv})" direction="out" name="logical_monitors"/>
+              <arg type="a{sv}" direction="out" name="properties"/>
+            </method>
+          </interface>
+        </node>`;
+    }
+
+    static _createDisplayConfigProxy(callback) {
+        const DisplayConfigProxy = Gio.DBusProxy.makeProxyWrapper(MonitorHandler._getDisplayConfigInterface());
+        return new DisplayConfigProxy(
+            Gio.DBus.session,
+            'org.gnome.Mutter.DisplayConfig',
+            '/org/gnome/Mutter/DisplayConfig',
+            callback
+        );
+    }
+
+    static _fetchMonitorDetails(callback) {
+        MonitorHandler._createDisplayConfigProxy(async (proxy, error) => {
+            if (error) {
+                log('Error creating proxy: ' + error.message);
+                callback([]);
+                return;
+            }
+
+            try {
+                const [serial, monitors] = await proxy.GetCurrentStateAsync();
+
+                const monitorDetails = monitors.map((monitor, index) => {
+                    const [connector, vendor, product] = monitor[0];
+                    const modes = monitor[1];
+
+                    const currentMode = modes.find(mode => "is-current" in mode[6]);
+                    const resolutionWidth = currentMode ? currentMode[1] : null;
+                    const resolutionHeight = currentMode ? currentMode[2] : null;
+
+                    const isBuiltIn = connector.toLowerCase().startsWith('edp') ||
+                                      connector.toLowerCase().startsWith('lvds');
+
+                    const displayName = isBuiltIn ? "Built-in display" : `${vendor} ${product}`;
+
+                    return {
+                        index,
+                        brand: vendor,
+                        model: product,
+                        serial,
+                        resolution: resolutionWidth && resolutionHeight ? {
+                            width: resolutionWidth,
+                            height: resolutionHeight
+                        } : {},
+                        displayName,
+                        connector,
+                        isBuiltIn
+                    };
+                });
+
+                MonitorHandler._monitors = monitorDetails;
+
+                let jsonMonitors = JSON.stringify(monitorDetails);
+                MonitorHandler._settings.set_string('monitor-config', jsonMonitors);
+
+                callback(monitorDetails);
+            } catch (e) {
+                log('Error in GetCurrentStateAsync: ' + e.message);
+                callback([]);
+            }
+        });
+    }
+
+    static updateMonitorList() {
+        MonitorHandler._fetchMonitorDetails(() => {});
+    }
+
+    static startWatching(settings) {
+        MonitorHandler._settings = settings
+        if (MonitorHandler._signalId !== null) {
+            MonitorHandler.stopWatching();
+        }
+
+        MonitorHandler._signalId = Main.layoutManager.connect('monitors-changed', () => {
+            log('Monitor change detected. Updating monitor list...');
+            MonitorHandler.updateMonitorList();
+        });
+
+        MonitorHandler.updateMonitorList()
+    }
+
+    static stopWatching() {
+        if (MonitorHandler._signalId !== null) {
+            Main.layoutManager.disconnect(MonitorHandler._signalId);
+            MonitorHandler._signalId = null;
+            log('MonitorHandler: stopped watching monitor layout changes');
+        }
+    }
+
+    static getMonitors() {
+        return MonitorHandler._monitors;
     }
 }

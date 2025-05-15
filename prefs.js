@@ -19,26 +19,6 @@ export default class BinuPreferences extends ExtensionPreferences {
     }
 }
 
-function _getMonitorName(index) {
-    const display = Gdk.Display.get_default();
-    const monitors = display.get_monitors();
-
-    if (index < 0 || index >= monitors.get_n_items()) {
-        return _('Invalid Monitor');
-    }
-
-    const monitor = monitors.get_item(index);
-
-    try {
-        const model = monitor.get_model();
-        if (model && model.trim() !== '') {
-            return model;
-        }
-    } catch (_) {
-    }
-    return monitor.get_connector()
-}
-
 class HomeSettings {
     constructor(schema) {
         this.schema = schema;
@@ -51,18 +31,25 @@ class HomeSettings {
         this.buildSwapSettings();
     }
 
+    _getMonitors() {
+        try {
+            const monitorsJSON = this.schema.get_string('monitor-config')
+            return JSON.parse(monitorsJSON)
+        }
+        catch {return []}
+    }
+
     buildNavigationSettings() {
         const group = new Adw.PreferencesGroup({ title: _('Navigate Monitors') });
 
         this.addShortcut(group, 'monitor-next', _('Navigate to next monitor'));
         this.addShortcut(group, 'monitor-prev', _('Navigate to previous monitor'));
 
-        const display = Gdk.Display.get_default();
-        const monitors = display.get_monitors();
-        const monitorCount = monitors.get_n_items();
-
-        for (let i = 0; i < monitorCount; i++) {
-            this.addShortcut(group, `monitor-${i}`, _(`Navigate to monitor ${i + 1}`), `Directly jump to the screen: ${_getMonitorName(i)}`);
+        const monitors = this._getMonitors()
+        for (const monitor of monitors) {
+            this.addShortcut(group, `monitor-${monitor.index}`,
+                  _(`Navigate to monitor ${monitor.index + 1} [${monitor.connector}]`),
+                  _(`Directly jump to the screen - <b>${monitor.displayName}</b>`));
         }
 
         this.page.add(group);
@@ -74,12 +61,11 @@ class HomeSettings {
         this.addShortcut(group, 'swap-next', _('Swap with next monitor'));
         this.addShortcut(group, 'swap-prev', _('Swap with previous monitor'));
 
-        const display = Gdk.Display.get_default();
-        const monitors = display.get_monitors();
-        const monitorCount = monitors.get_n_items();
-
-        for (let i = 0; i < monitorCount; i++) {
-            this.addShortcut(group, `swap-${i}`, _(`Swap with monitor ${i + 1}`), `Swap all applications from current monitor with ${_getMonitorName(i)}`);
+        const monitors = this._getMonitors()
+        for (const monitor of monitors) {
+            this.addShortcut(group, `swap-${monitor.index}`,
+                  _(`Swap with monitor ${monitor.index + 1} [${monitor.connector}]`),
+                  _(`Swap all applications from current monitor with <b>${monitor.displayName}</b>`));
         }
 
         this.page.add(group);

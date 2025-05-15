@@ -1,5 +1,13 @@
 <schemalist>
   <schema id="org.gnome.shell.extensions.binu" path="/org/gnome/shell/extensions/binu/">
+
+    <!-- The Serialized JSON for currently connected monitors -->
+    <key name="monitor-config" type="s">
+      <default>"{}"</default>
+      <summary>Serialized monitor configuration</summary>
+      <description>JSON string of monitor details written by the extension</description>
+    </key>
+
     <!-- Navigation Shortcuts -->
     <key name="monitor-next" type="as">
       <default>[]</default>

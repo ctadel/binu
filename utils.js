@@ -48,7 +48,6 @@ export class Timer {
 export class ShortcutManager {
     constructor(settings) {
         this.settings = settings;
-        this.registered = new Set();
     }
 
     register(name, handler) {
@@ -61,14 +60,17 @@ export class ShortcutManager {
             Shell.ActionMode.ALL,
             handler
         );
-        this.registered.add(name);
     }
 
     unregisterAll() {
-        for (const name of this.registered) {
-            Main.wm.removeKeybinding(name);
+        Main.wn.removeKeybinding(`monitor-next`);
+        Main.wn.removeKeybinding(`monitor-prev`);
+        Main.wn.removeKeybinding(`swap-next`);
+        Main.wn.removeKeybinding(`swap-prev`);
+        for (let i = 0; i < 8; i++) {
+            Main.wn.removeKeybinding(`monitor-${i}`);
+            Main.wn.removeKeybinding(`swap-${i}`);
         }
-        this.registered.clear();
     }
 }
 
