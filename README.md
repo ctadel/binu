@@ -28,7 +28,7 @@ This extension doesn't have any dependency on third party libraries.
 
 1. Clone this repository or copy it into your GNOME extensions directory:  
    bash
-   git clone https://github.com/ctadel/binu.git ~/.local/share/gnome-shell/extensions/binu@ctadel
+   git clone https://github.com/ctadel/gnome-binu.git ~/.local/share/gnome-shell/extensions/binu@ctadel
 
 2. Restart GNOME Shell:  
    - On **X11**: Press `Alt + F2`, type `r`, and press Enter.  
